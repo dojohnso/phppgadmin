@@ -686,13 +686,17 @@
 		if ($inheritChildren && $inheritChildren->recordCount() > 0) {
 			echo "<h3>Inherited Tables</h3>\n";
 			echo "<table class=\"data\">\n";
-			echo "<tr><th class=\"data\">Table</th></tr>\n";
+			echo "<tr><th class=\"data\">Table</th><th class=\"data\">Estimated Rows</th></tr>\n";
 			$rowclass = 1;
 			while (!$inheritChildren->EOF) {
 				$cname   = htmlspecialchars($inheritChildren->fields['relname']);
 				$cschema = htmlspecialchars($inheritChildren->fields['nspname']);
+				$crows   = ($inheritChildren->fields['estimated_rows'] == -1)
+					? '<em>not analyzed</em>'
+					: htmlspecialchars($inheritChildren->fields['estimated_rows']);
 				echo "<tr class=\"data{$rowclass}\">\n";
 				echo "\t<td><a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($cschema)."&amp;table=".urlencode($cname)."\">&#x21AA; {$cname}</a></td>\n";
+				echo "\t<td style=\"text-align:right\">{$crows}</td>\n";
 				echo "</tr>\n";
 				$rowclass = ($rowclass == 1) ? 2 : 1;
 				$inheritChildren->moveNext();

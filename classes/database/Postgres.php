@@ -1256,7 +1256,8 @@ class Postgres extends ADODB_base {
 		$sql = "
 			SELECT
 				cn.nspname,
-				cc.relname
+				cc.relname,
+				cc.reltuples::bigint AS estimated_rows
 			FROM pg_catalog.pg_inherits i
 			JOIN pg_catalog.pg_class cc ON cc.oid = i.inhrelid
 			JOIN pg_catalog.pg_namespace cn ON cn.oid = cc.relnamespace
