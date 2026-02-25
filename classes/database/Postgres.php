@@ -183,7 +183,8 @@ class Postgres extends ADODB_base {
 	function clean(&$str) {
 		if ($str === null) return null;
 		$str = str_replace("\r\n","\n",$str);
-		$str = pg_escape_string($str);
+		$conn = $this->conn->_connectionID;
+		$str = pg_escape_string($conn,$str);
 		return $str;
 	}
 
@@ -219,7 +220,8 @@ class Postgres extends ADODB_base {
 	function arrayClean(&$arr) {
 		foreach ($arr as $k => $v) {
 			if ($v === null) continue;
-			$arr[$k] = pg_escape_string($v);
+			$conn = $this->conn->_connectionID;
+			$arr[$k] = pg_escape_string($conn,$v);
 		}
 		return $arr;
 	}
@@ -2629,9 +2631,9 @@ class Postgres extends ADODB_base {
 		$this->fieldClean($sequence);
 		$this->clean($sequence);
 
-		$sql = "SELECT pg_catalog.has_sequence_privilege('{$f_schema}.{$sequence}','SELECT,USAGE')";
+		$sql = "SELECT pg_catalog.has_sequence_privilege('{$f_schema}.{$sequence}','SELECT,USAGE') AS priv";
 
-		return $this->execute($sql);
+		return $this->selectField($sql, 'priv');
 	}
 
 	/**

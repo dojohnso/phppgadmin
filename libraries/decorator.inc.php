@@ -102,6 +102,7 @@ class Decorator
 
 class FieldDecorator extends Decorator
 {
+	private $f;
 	function __construct($fieldName, $default = null) {
 		$this->f = $fieldName;
 		if ($default !== null) $this->d = $default;
@@ -173,6 +174,7 @@ class IfEmptyDecorator extends Decorator
 
 class UrlDecorator extends Decorator
 {
+	private $b,$q;
 	function __construct($base, $queryVars = null) {
 		$this->b = $base;
 		if ($queryVars !== null)
@@ -199,6 +201,7 @@ class UrlDecorator extends Decorator
 
 class replaceDecorator extends Decorator
 {
+	private $s,$p;
 	function __construct($str, $params) {
 		$this->s = $str;
 		$this->p = $params;

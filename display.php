@@ -425,7 +425,7 @@
 	 * Displays requested data
 	 */
 	function doBrowse($msg = '') {
-		global $data, $conf, $misc, $lang, $plugin_manager;
+		global $data, $conf, $misc, $lang, $plugin_manager, $_connection;
 
 		$save_history = false;
 		// If current page is not set, default to first page
@@ -529,11 +529,12 @@
 		if (isset($_REQUEST['query'])) {
 			$query = $_REQUEST['query'];
 		} else {
-			$query = "SELECT * FROM ".pg_escape_identifier($_REQUEST['schema']);
+			$conn = $_connection->conn->_connectionID;
+			$query = "SELECT * FROM ".pg_escape_identifier($conn, $_REQUEST['schema']);
 			if ($_REQUEST['subject'] == 'view') {
-				$query = "{$query}.".pg_escape_identifier($_REQUEST['view']).";";
+				$query = "{$query}.".pg_escape_identifier($conn, $_REQUEST['view']).";";
 			} else {
-				$query = "{$query}.".pg_escape_identifier($_REQUEST['table']).";";
+				$query = "{$query}.".pg_escape_identifier($conn, $_REQUEST['table']).";";
 			}
 		}
 		//$query = isset($_REQUEST['query'])? $_REQUEST['query'] : "select * from {$_REQUEST['schema']}.{$_REQUEST['table']};";

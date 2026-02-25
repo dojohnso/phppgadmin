@@ -116,11 +116,11 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	// I'm not familiar enough with both ADODB as well as Postgres 
 	// to know what the concequences are. The other values are correct (wheren't in 0.94)
 	// -- Freek Dijkstra 
-
-	function ADODB_postgres64() 
-	{
-	// changes the metaColumnsSQL, adds columns: attnum[6]
-	}
+	private $version;
+	function __construct()
+    {
+       // changes the metaColumnsSQL, adds columns: attnum[6]
+    }
 	
 	function ServerInfo()
 	{
@@ -652,6 +652,7 @@ WHERE (c2.relname=\'%s\' or c2.relname=lower(\'%s\'))';
 	// examples:
 	// 	$db->Connect("host=host1 user=user1 password=secret port=4341");
 	// 	$db->Connect('host1','user1','secret');
+	private $pgVersion,$_nestedSQL;
 	function _connect($str,$user='',$pwd='',$db='',$ctype=0)
 	{
 		
@@ -689,7 +690,7 @@ WHERE (c2.relname=\'%s\' or c2.relname=lower(\'%s\'))';
 				
 				$str .= str_repeat(' ',$ncnt);
 			}
-			$this->_connectionID = @pg_connect($str);
+			$this->_connectionID = pg_connect($str);
 		}
 		if ($this->_connectionID === false) return false;
 		$this->Execute("set datestyle='ISO'");
@@ -873,6 +874,7 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 	var $_blobArr;
 	var $databaseType = "postgres64";
 	var $canSeek = true;
+	private $adodbFetchMode;
 	function __construct($queryID,$mode=false) 
 	{
 		if ($mode === false) { 

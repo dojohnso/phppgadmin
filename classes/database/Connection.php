@@ -76,7 +76,11 @@ class Connection {
 
 		// Detect version and choose appropriate database driver
         switch (substr($version,0,2)) {
-            case '14': return 'Postgres';break;
+			case '14':
+            case '15':
+            case '16':
+                return 'Postgres';
+                break;
             case '13': return 'Postgres13';break;
             case '12': return 'Postgres12';break;
             case '11': return 'Postgres11';break;

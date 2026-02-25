@@ -490,11 +490,12 @@
 			// The description of the server is returned in $platform.
 			$_type = $_connection->getDriver($platform);
 			if ($_type === null) {
-				printf($lang['strpostgresqlversionnotsupported'], $postgresqlMinVer);
+				print_r($platform);
+				printf($lang['strpostgresqlversionnotsupported'], _POSTGRES_MIN_VERSION_);
 				exit;
 			}
 			$this->setServerInfo('platform', $platform, $server_id);
-			$this->setServerInfo('pgVersion', $_connection->conn->pgVersion, $server_id);
+			$this->setServerInfo('pgVersion', $_connection->conn->ServerInfo()['version'], $server_id);
 
 			// Create a database wrapper class for easy manipulation of the
 			// connection.

@@ -10,7 +10,7 @@
 	include_once('./lang/translations.php');
 
 	// Set error reporting level to max
-	error_reporting(E_ALL);
+	// error_reporting(E_ALL);
  
 	// Application name
 	$appName = 'phpPgAdmin';
@@ -21,6 +21,7 @@
 	// PostgreSQL and PHP minimum version
 	$postgresqlMinVer = '7.4';
 	$phpMinVer = '7.2';
+	define('_POSTGRES_MIN_VERSION_', '7.4');
 
 	// Check the version of PHP
 	if (version_compare(phpversion(), $phpMinVer, '<'))
@@ -236,7 +237,7 @@
 		$_server_info = $misc->getServerInfo();
 
 		/* starting with PostgreSQL 9.0, we can set the application name */
-		if(isset($_server_info['pgVersion']) && $_server_info['pgVersion'] >= 9)
+		if(isset($_server_info['pgVersion']) && version_compare($_server_info['pgVersion'], '9', '>='))
 			putenv("PGAPPNAME={$appName}_{$appVersion}");
 
 		// Redirect to the login form if not logged in
