@@ -15,10 +15,18 @@ This fork extends the PHP 8.2 compatibility work with full PostgreSQL 16 support
 
 phpPgAdmin previously only showed child partition tables (e.g. `orders_2024_01`) and hid partitioned parent tables entirely. This fork makes all partition tables visible and navigable:
 
-- **Flat table list** — parent and child partition tables appear together, labeled `[P]`, `[Pc]`, or `[P+Pc]` (sub-partitioned tables that are both a parent and a child)
+- **Flat table list** — parent and child partition tables appear together; child partitions are prefixed with `↳` in the table list
 - **Partition detail panel** — partitioned parent table pages show partition method (RANGE/LIST/HASH), key, and a linked list of child partitions with bounds and row estimates
 - **Parent back-link** — child partition table pages show a link back to the parent table
 - **"not analyzed" row counts** — PostgreSQL 14+ uses `-1` as a sentinel for tables that have never been analyzed; displays as `not analyzed` instead of a confusing `-1`
+
+### Legacy Table Inheritance Support
+
+For databases using pre-declarative trigger-based inheritance (`INHERITS`):
+
+- **Table list** — legacy inheritance children are prefixed with `↪` (distinct from `↳` for native partitions)
+- **Inherited Tables panel** — parent table properties pages show a linked list of child tables
+- **Inherits from back-link** — child table properties pages show links back to all parent tables (supports multiple-parent inheritance)
 
 ### PHP 8 Compatibility Fixes
 
