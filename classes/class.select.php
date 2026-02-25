@@ -11,10 +11,10 @@
 * 
 */
 class XHtmlSimpleElement {
-	var $_element;
-	var $_siblings = array();
-	var $_htmlcode;	
-	var $_attributes = array();
+	public $_element;
+	public $_siblings = array();
+	public $_htmlcode;	
+	public $_attributes = array();
 
 	
 	/**
@@ -89,9 +89,9 @@ class XHtmlSimpleElement {
 * 
 */
 class XHtmlElement extends XHtmlSimpleElement {
-	var $_text     = null;	
-	var $_htmlcode = "";
-	var $_siblings = array();
+	public $_text     = null;	
+	public $_htmlcode = "";
+	public $_siblings = array();
 
 	function __construct($text = null) {
 		parent::__construct();
@@ -178,7 +178,7 @@ class XHTML_Option extends XHtmlElement {
 
 
 class XHTML_Select extends XHTMLElement {
-	var $_data;
+	public $_data;
 
 	function __construct($name, $multiple = false, $size = null) {
 		parent::__construct();					

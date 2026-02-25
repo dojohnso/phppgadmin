@@ -16,11 +16,6 @@
 			$urlvars[$k] = value($urlvar, $_REQUEST);
 		}
 
-		/* parse_str function is affected by magic_quotes_gpc */
-		if (ini_get('magic_quotes_gpc')) {
-			$misc->stripVar($urlvars);
-		}
-
 		$_REQUEST = array_merge($_REQUEST, $urlvars);
 		$_GET = array_merge($_GET, $urlvars);
 	}

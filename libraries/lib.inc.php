@@ -20,7 +20,7 @@
 
 	// PostgreSQL and PHP minimum version
 	$postgresqlMinVer = '7.4';
-	$phpMinVer = '7.2';
+	$phpMinVer = '8.0';
 	define('_POSTGRES_MIN_VERSION_', '7.4');
 
 	// Check the version of PHP
@@ -57,21 +57,10 @@
 		session_start();
 	}
 
-	// Do basic PHP configuration checks
-	if (ini_get('magic_quotes_gpc')) {
-		$misc->stripVar($_GET);
-		$misc->stripVar($_POST);
-		$misc->stripVar($_COOKIE);
-		$misc->stripVar($_REQUEST);
-	}
-
-	// This has to be deferred until after stripVar above
 	$misc->setHREF();
 	$misc->setForm();
 
 	// Enforce PHP environment
-	ini_set('magic_quotes_runtime', 0);
-	ini_set('magic_quotes_sybase', 0);
 	ini_set('arg_separator.output', '&amp;');
 
 	// If login action is set, then set session variables
@@ -266,12 +255,6 @@
 				echo $lang['strbadschema'];
 				exit;
 			}
-		}
-	}
-
-	if (!function_exists("htmlspecialchars_decode")) {
-		function htmlspecialchars_decode($string, $quote_style = ENT_COMPAT) {
-			return strtr($string, array_flip(get_html_translation_table(HTML_SPECIALCHARS, $quote_style)));
 		}
 	}
 

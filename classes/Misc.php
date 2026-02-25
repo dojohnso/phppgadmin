@@ -7,9 +7,9 @@
 
 	class Misc {
 		// Tracking string to include in HREFs
-		var $href;
+		public $href;
 		// Tracking string to include in forms
-		var $form;
+		public $form;
 
 		/* Constructor */
 		function __construct() { 
@@ -1981,7 +1981,7 @@
 				foreach ($columns as $column_id => $column) {
 					switch ($column_id) {
 						case 'actions':
-							if (sizeof($actions) > 0) echo "<th class=\"data\" colspan=\"", count($actions), "\">{$column['title']}</th>\n";
+							if (count($actions) > 0) echo "<th class=\"data\" colspan=\"", count($actions), "\">{$column['title']}</th>\n";
 							break;
 						default:
 							echo "<th class=\"data{$class}\">";

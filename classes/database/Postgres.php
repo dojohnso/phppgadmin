@@ -11,15 +11,15 @@ include_once('./classes/database/ADODB_base.php');
 
 class Postgres extends ADODB_base {
 
-	var $major_version = 14;
+	public $major_version = 14;
 	// Max object name length
-	var $_maxNameLen = 63;
+	public $_maxNameLen = 63;
 	// Store the current schema
-	var $_schema;
+	public $_schema;
 	// Map of database encoding names to HTTP encoding names.  If a
 	// database encoding does not appear in this list, then its HTTP
 	// encoding name is the same as its database encoding name.
-	var $codemap = array(
+	public $codemap = array(
 		'BIG5' => 'BIG5',
 		'EUC_CN' => 'GB2312',
 		'EUC_JP' => 'EUC-JP',
@@ -55,28 +55,28 @@ class Postgres extends ADODB_base {
 		'WIN1256' => 'CP1256',
 		'WIN1258' => 'CP1258'
 	);
-	var $defaultprops = array('', '', '');
+	public $defaultprops = array('', '', '');
 	// Extra "magic" types.  BIGSERIAL was added in PostgreSQL 7.2.
-	var $extraTypes = array('SERIAL', 'BIGSERIAL');
+	public $extraTypes = array('SERIAL', 'BIGSERIAL');
 	// Foreign key stuff.  First element MUST be the default.
-	var $fkactions = array('NO ACTION', 'RESTRICT', 'CASCADE', 'SET NULL', 'SET DEFAULT');
-	var $fkdeferrable = array('NOT DEFERRABLE', 'DEFERRABLE');
-	var $fkinitial = array('INITIALLY IMMEDIATE', 'INITIALLY DEFERRED');
-	var $fkmatches = array('MATCH SIMPLE', 'MATCH FULL');
+	public $fkactions = array('NO ACTION', 'RESTRICT', 'CASCADE', 'SET NULL', 'SET DEFAULT');
+	public $fkdeferrable = array('NOT DEFERRABLE', 'DEFERRABLE');
+	public $fkinitial = array('INITIALLY IMMEDIATE', 'INITIALLY DEFERRED');
+	public $fkmatches = array('MATCH SIMPLE', 'MATCH FULL');
 	// Function properties
-	var $funcprops = array( array('', 'VOLATILE', 'IMMUTABLE', 'STABLE'),
+	public $funcprops = array( array('', 'VOLATILE', 'IMMUTABLE', 'STABLE'),
 							array('', 'CALLED ON NULL INPUT', 'RETURNS NULL ON NULL INPUT'),
 							array('', 'SECURITY INVOKER', 'SECURITY DEFINER'));
 	// Default help URL
-	var $help_base;
+	public $help_base;
 	// Help sub pages
-	var $help_page;
+	public $help_page;
 	// Name of id column
-	var $id = 'oid';
+	public $id = 'oid';
 	// Supported join operations for use with view wizard
-	var $joinOps = array('INNER JOIN' => 'INNER JOIN', 'LEFT JOIN' => 'LEFT JOIN', 'RIGHT JOIN' => 'RIGHT JOIN', 'FULL JOIN' => 'FULL JOIN');
+	public $joinOps = array('INNER JOIN' => 'INNER JOIN', 'LEFT JOIN' => 'LEFT JOIN', 'RIGHT JOIN' => 'RIGHT JOIN', 'FULL JOIN' => 'FULL JOIN');
 	// Map of internal language name to syntax highlighting name
-	var $langmap = array(
+	public $langmap = array(
 		'sql' => 'SQL',
 		'plpgsql' => 'SQL',
 		'php' => 'PHP',
@@ -103,10 +103,10 @@ class Postgres extends ADODB_base {
 		'plrubyu' => 'Ruby'
 	);
 	// Predefined size types
-	var $predefined_size_types = array('abstime','aclitem','bigserial','boolean','bytea','cid','cidr','circle','date','float4','float8','gtsvector','inet','int2','int4','int8','macaddr','money','oid','path','polygon','refcursor','regclass','regoper','regoperator','regproc','regprocedure','regtype','reltime','serial','smgr','text','tid','tinterval','tsquery','tsvector','varbit','void','xid');
+	public $predefined_size_types = array('abstime','aclitem','bigserial','boolean','bytea','cid','cidr','circle','date','float4','float8','gtsvector','inet','int2','int4','int8','macaddr','money','oid','path','polygon','refcursor','regclass','regoper','regoperator','regproc','regprocedure','regtype','reltime','serial','smgr','text','tid','tinterval','tsquery','tsvector','varbit','void','xid');
 	// List of all legal privileges that can be applied to different types
 	// of objects.
-	var $privlist = array(
+	public $privlist = array(
   		'table' => array('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'REFERENCES', 'TRIGGER', 'ALL PRIVILEGES'),
   		'view' => array('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'REFERENCES', 'TRIGGER', 'ALL PRIVILEGES'),
   		'sequence' => array('USAGE', 'SELECT', 'UPDATE', 'ALL PRIVILEGES'),
@@ -119,7 +119,7 @@ class Postgres extends ADODB_base {
 	);
 	// List of characters in acl lists and the privileges they
 	// refer to.
-	var $privmap = array(
+	public $privmap = array(
 		'r' => 'SELECT',
 		'w' => 'UPDATE',
 		'a' => 'INSERT',
@@ -135,9 +135,9 @@ class Postgres extends ADODB_base {
   		'c' => 'CONNECT'
 	);
 	// Rule action types
-	var $rule_events = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
+	public $rule_events = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
 	// Select operators
-	var $selectOps = array('=' => 'i', '!=' => 'i', '<' => 'i', '>' => 'i', '<=' => 'i', '>=' => 'i',
+	public $selectOps = array('=' => 'i', '!=' => 'i', '<' => 'i', '>' => 'i', '<=' => 'i', '>=' => 'i',
 		'<<' => 'i', '>>' => 'i', '<<=' => 'i', '>>=' => 'i',
 		'LIKE' => 'i', 'NOT LIKE' => 'i', 'ILIKE' => 'i', 'NOT ILIKE' => 'i', 'SIMILAR TO' => 'i',
 		'NOT SIMILAR TO' => 'i', '~' => 'i', '!~' => 'i', '~*' => 'i', '!~*' => 'i',
@@ -146,24 +146,24 @@ class Postgres extends ADODB_base {
 		'@@ to_tsquery' => 't', '@@@ to_tsquery' => 't', '@> to_tsquery' => 't', '<@ to_tsquery' => 't',
 		'@@ plainto_tsquery' => 't', '@@@ plainto_tsquery' => 't', '@> plainto_tsquery' => 't', '<@ plainto_tsquery' => 't');
 	// Array of allowed trigger events
-	var $triggerEvents= array('INSERT', 'UPDATE', 'DELETE', 'INSERT OR UPDATE', 'INSERT OR DELETE',
+	public $triggerEvents= array('INSERT', 'UPDATE', 'DELETE', 'INSERT OR UPDATE', 'INSERT OR DELETE',
 		'DELETE OR UPDATE', 'INSERT OR DELETE OR UPDATE');
 	// When to execute the trigger
-	var $triggerExecTimes = array('BEFORE', 'AFTER');
+	public $triggerExecTimes = array('BEFORE', 'AFTER');
 	// How often to execute the trigger
-	var $triggerFrequency = array('ROW','STATEMENT');
+	public $triggerFrequency = array('ROW','STATEMENT');
 	// Array of allowed type alignments
-	var $typAligns = array('char', 'int2', 'int4', 'double');
+	public $typAligns = array('char', 'int2', 'int4', 'double');
 	// The default type alignment
-	var $typAlignDef = 'int4';
+	public $typAlignDef = 'int4';
 	// Default index type
-	var $typIndexDef = 'BTREE';
+	public $typIndexDef = 'BTREE';
 	// Array of allowed index types
-	var $typIndexes = array('BTREE', 'RTREE', 'GIST', 'GIN', 'HASH');
+	public $typIndexes = array('BTREE', 'RTREE', 'GIST', 'GIN', 'HASH');
 	// Array of allowed type storage attributes
-	var $typStorages = array('plain', 'external', 'extended', 'main');
+	public $typStorages = array('plain', 'external', 'extended', 'main');
 	// The default type storage
-	var $typStorageDef = 'plain';
+	public $typStorageDef = 'plain';
 
 	/**
 	 * Constructor
@@ -900,8 +900,8 @@ class Postgres extends ADODB_base {
 	 */
 	function setSearchPath($paths) {
 		if (!is_array($paths)) return -1;
-		elseif (sizeof($paths) == 0) return -2;
-		elseif (sizeof($paths) == 1 && $paths[0] == '') {
+		elseif (count($paths) == 0) return -2;
+		elseif (count($paths) == 1 && $paths[0] == '') {
 			// Need to handle empty paths in some cases
 			$paths[0] = 'pg_catalog';
 		}
@@ -1545,7 +1545,7 @@ class Postgres extends ADODB_base {
 			return null;
 		}
 
-		if (sizeof($privs) > 0) {
+		if (count($privs) > 0) {
 			$sql .= "\n-- Privileges\n\n";
 			/*
 			 * Always start with REVOKE ALL FROM PUBLIC, so that we don't have to
@@ -1558,7 +1558,7 @@ class Postgres extends ADODB_base {
 				$nongrant = array_diff($v[2], $v[4]);
 
 				// Skip empty or owner ACEs
-				if (sizeof($v[2]) == 0 || ($v[0] == 'user' && $v[1] == $t->fields['relowner'])) continue;
+				if (count($v[2]) == 0 || ($v[0] == 'user' && $v[1] == $t->fields['relowner'])) continue;
 
 				// Change user if necessary
 				if ($this->hasGrantOption() && $v[3] != $t->fields['relowner']) {
@@ -1595,7 +1595,7 @@ class Postgres extends ADODB_base {
 				// Output privileges with GRANT OPTION
 
 				// Skip empty or owner ACEs
-				if (!$this->hasGrantOption() || sizeof($v[4]) == 0) continue;
+				if (!$this->hasGrantOption() || count($v[4]) == 0) continue;
 
 				// Change user if necessary
 				if ($this->hasGrantOption() && $v[3] != $t->fields['relowner']) {
@@ -2077,7 +2077,7 @@ class Postgres extends ADODB_base {
 
 		if (!is_array($atts)) return -1;
 
-		if (sizeof($atts) == 0) return array();
+		if (count($atts) == 0) return array();
 
 		$sql = "SELECT attnum, attname FROM pg_catalog.pg_attribute WHERE
 			attrelid=(SELECT oid FROM pg_catalog.pg_class WHERE relname='{$table}' AND
@@ -2085,7 +2085,7 @@ class Postgres extends ADODB_base {
 			AND attnum IN ('" . join("','", $atts) . "')";
 
 		$rs = $this->selectSet($sql);
-		if ($rs->recordCount() != sizeof($atts)) {
+		if ($rs->recordCount() != count($atts)) {
 				return -2;
 			}
 		else {
@@ -2651,7 +2651,7 @@ class Postgres extends ADODB_base {
 			$this->fieldClean($table);
 
 			// Build clause
-			if (sizeof($vars) > 0) {
+			if (count($vars) > 0) {
 
 				foreach($vars as $key => $value) {
 					$this->fieldClean($key);
@@ -3713,7 +3713,7 @@ class Postgres extends ADODB_base {
 	 * @return -1 no fields given
 	 */
 	function addPrimaryKey($table, $fields, $name = '', $tablespace = '') {
-		if (!is_array($fields) || sizeof($fields) == 0) return -1;
+		if (!is_array($fields) || count($fields) == 0) return -1;
 		$f_schema = $this->_schema;
 		$this->fieldClean($f_schema);
 		$this->fieldClean($table);
@@ -3741,7 +3741,7 @@ class Postgres extends ADODB_base {
 	 * @return -1 no fields given
 	 */
 	function addUniqueKey($table, $fields, $name = '', $tablespace = '') {
-		if (!is_array($fields) || sizeof($fields) == 0) return -1;
+		if (!is_array($fields) || count($fields) == 0) return -1;
 		$f_schema = $this->_schema;
 		$this->fieldClean($f_schema);
 		$this->fieldClean($table);
@@ -3855,8 +3855,8 @@ class Postgres extends ADODB_base {
 	 */
 	function addForeignKey($table, $targschema, $targtable, $sfields, $tfields, $upd_action, $del_action,
 	$match, $deferrable, $initially, $name = '') {
-		if (!is_array($sfields) || sizeof($sfields) == 0 ||
-			!is_array($tfields) || sizeof($tfields) == 0) return -1;
+		if (!is_array($sfields) || count($sfields) == 0 ||
+			!is_array($tfields) || count($tfields) == 0) return -1;
 		$f_schema = $this->_schema;
 		$this->fieldClean($f_schema);
 		$this->fieldClean($table);
@@ -3915,7 +3915,7 @@ class Postgres extends ADODB_base {
 		$schema_list = "'{$tables[0]['schemaname']}'";
 		$schema_tables_list = "'{$tables[0]['schemaname']}.{$tables[0]['tablename']}'";
 
-		for ($i = 1; $i < sizeof($tables); $i++) {
+		for ($i = 1; $i < count($tables); $i++) {
 			$this->clean($tables[$i]['tablename']);
 			$this->clean($tables[$i]['schemaname']);
 			$tables_list .= ", '{$tables[$i]['tablename']}'";
@@ -3942,7 +3942,7 @@ class Postgres extends ADODB_base {
 		$rs = $this->selectSet($sql);
 		while (!$rs->EOF) {
 			$arrData = explode(':', $rs->fields['arr_dim']);
-			$tmpDimension = intval(substr($arrData[1], 0, strlen($arrData[1] - 1)));
+			$tmpDimension = intval(substr($arrData[1], 0, strlen($arrData[1]) - 1));
 			$maxDimension = $tmpDimension > $maxDimension ? $tmpDimension : $maxDimension;
 			$rs->MoveNext();
 		}
@@ -6322,9 +6322,9 @@ class Postgres extends ADODB_base {
 		$sql .= ($login) ? ' LOGIN' : ' NOLOGIN';
 		if ($connlimit != '') $sql .= " CONNECTION LIMIT {$connlimit}"; else  $sql .= ' CONNECTION LIMIT -1';
 		if ($expiry != '') $sql .= " VALID UNTIL '{$expiry}'"; else $sql .= " VALID UNTIL 'infinity'";
-		if (is_array($memberof) && sizeof($memberof) > 0) $sql .= ' IN ROLE "' . join('", "', $memberof) . '"';
-		if (is_array($members) && sizeof($members) > 0) $sql .= ' ROLE "' . join('", "', $members) . '"';
-		if (is_array($adminmembers) && sizeof($adminmembers) > 0) $sql .= ' ADMIN "' . join('", "', $adminmembers) . '"';
+		if (is_array($memberof) && count($memberof) > 0) $sql .= ' IN ROLE "' . join('", "', $memberof) . '"';
+		if (is_array($members) && count($members) > 0) $sql .= ' ROLE "' . join('", "', $members) . '"';
+		if (is_array($adminmembers) && count($adminmembers) > 0) $sql .= ' ADMIN "' . join('", "', $adminmembers) . '"';
 
 		return $this->execute($sql);
 	}
@@ -6526,7 +6526,7 @@ class Postgres extends ADODB_base {
 		if ($password != '') $sql .= " WITH ENCRYPTED PASSWORD '{$enc}'";
 		$sql .= ($createdb) ? ' CREATEDB' : ' NOCREATEDB';
 		$sql .= ($createuser) ? ' CREATEUSER' : ' NOCREATEUSER';
-		if (is_array($groups) && sizeof($groups) > 0) $sql .= " IN GROUP \"" . join('", "', $groups) . "\"";
+		if (is_array($groups) && count($groups) > 0) $sql .= " IN GROUP \"" . join('", "', $groups) . "\"";
 		if ($expiry != '') $sql .= " VALID UNTIL '{$expiry}'";
 		else $sql .= " VALID UNTIL 'infinity'";
 
@@ -6762,7 +6762,7 @@ class Postgres extends ADODB_base {
 
 		$sql = "CREATE GROUP \"{$groname}\"";
 
-		if (is_array($users) && sizeof($users) > 0) {
+		if (is_array($users) && count($users) > 0) {
 			$this->fieldArrayClean($users);
 			$sql .= ' WITH USER "' . join('", "', $users) . '"';
 		}
@@ -7003,9 +7003,9 @@ class Postgres extends ADODB_base {
 		$this->fieldArrayClean($groupnames);
 
 		// Input checking
-		if (!is_array($privileges) || sizeof($privileges) == 0) return -3;
+		if (!is_array($privileges) || count($privileges) == 0) return -3;
 		if (!is_array($usernames) || !is_array($groupnames) ||
-			(!$public && sizeof($usernames) == 0 && sizeof($groupnames) == 0)) return -4;
+			(!$public && count($usernames) == 0 && count($groupnames) == 0)) return -4;
 		if ($mode != 'GRANT' && $mode != 'REVOKE') return -5;
 
 		$sql = $mode;
@@ -7813,7 +7813,7 @@ class Postgres extends ADODB_base {
 		$this->fieldArrayClean($show);
 
 		// If an empty array is passed in, then show all columns
-		if (sizeof($show) == 0) {
+		if (count($show) == 0) {
 			if ($this->hasObjectID($table))
 				$sql = "SELECT \"{$this->id}\", * FROM ";
 			else
@@ -7840,7 +7840,7 @@ class Postgres extends ADODB_base {
 
 		// If we have values specified, add them to the WHERE clause
 		$first = true;
-		if (is_array($values) && sizeof($values) > 0) {
+		if (is_array($values) && count($values) > 0) {
 			foreach ($values as $k => $v) {
 				if ($v != '' || $this->selectOps[$ops[$k]] == 'p') {
 					$this->fieldClean($k);
@@ -7876,7 +7876,7 @@ class Postgres extends ADODB_base {
 		}
 
 		// ORDER BY
-		if (is_array($orderby) && sizeof($orderby) > 0) {
+		if (is_array($orderby) && count($orderby) > 0) {
 			$sql .= " ORDER BY ";
 			$first = true;
 			foreach ($orderby as $k => $v) {
@@ -8023,7 +8023,7 @@ class Postgres extends ADODB_base {
 		$this->fieldClean($table);
 
 		$sql = "SELECT * FROM \"{$f_schema}\".\"{$table}\"";
-		if (is_array($key) && sizeof($key) > 0) {
+		if (is_array($key) && count($key) > 0) {
 			$sql .= " WHERE true";
 			foreach ($key as $k => $v) {
 				$this->fieldClean($k);

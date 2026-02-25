@@ -11,10 +11,10 @@ include_once('./libraries/adodb/adodb.inc.php');
 
 class ADODB_base {
 
-	var $conn;
+	public $conn;
 	
 	// The backend platform.  Set to UNKNOWN by default.
-	var $platform = 'UNKNOWN';
+	public $platform = 'UNKNOWN';
 
 	/**
 	 * Base constructor
@@ -168,7 +168,7 @@ class ADODB_base {
 		$this->fieldClean($table);
 
 		// Build clause
-		if (sizeof($vars) > 0) {
+		if (count($vars) > 0) {
 			$fields = '';
 			$values = '';
 			foreach($vars as $key => $value) {
@@ -334,7 +334,7 @@ class ADODB_base {
 
 		// Do one further loop over the elements array to remote double quoting
 		// and escaping of double quotes and backslashes
-		for ($i = 0; $i < sizeof($elements); $i++) {
+		for ($i = 0; $i < count($elements); $i++) {
 			$v = $elements[$i];
 			if (strpos($v, '"') === 0) {
 				$v = substr($v, 1, strlen($v) - 2);
