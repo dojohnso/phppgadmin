@@ -7,7 +7,7 @@ Personally, I prefer phpPgAdmin over any other PostgreSQL UI tools due to its si
 
 ---
 
-## RxTracker Fork — PHP 8 + PostgreSQL 16 Enhancements
+## Fork Enhancements — PHP 8 + PostgreSQL 16
 
 This fork extends the PHP 8.2 compatibility work with full PostgreSQL 16 support, focusing on declarative partition visibility and additional PHP 8 modernization.
 
