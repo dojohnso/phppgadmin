@@ -653,7 +653,7 @@
 							? '<em>not analyzed</em>'
 							: htmlspecialchars($partitions->fields['estimated_rows']);
 						echo "<tr class=\"data{$rowclass}\">\n";
-						echo "\t<td><a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($pschema)."&amp;table=".urlencode($pname)."\">[Pc] {$pname}</a></td>\n";
+						echo "\t<td><a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($pschema)."&amp;table=".urlencode($pname)."\">↳ {$pname}</a></td>\n";
 						echo "\t<td><code>{$pbounds}</code></td>\n";
 						echo "\t<td>{$prows}</td>\n";
 						echo "</tr>\n";
@@ -676,7 +676,7 @@
 				$parentSchema = htmlspecialchars($parent->fields['parent_schema']);
 				echo "<p class=\"comment\"><strong>Partition of:</strong> ";
 				echo "<a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($parentSchema)."&amp;table=".urlencode($parentTable)."\">";
-				echo "[P] {$parentTable}</a></p>\n";
+				echo "{$parentTable}</a></p>\n";
 			}
 		}
 

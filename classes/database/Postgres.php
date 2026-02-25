@@ -1077,7 +1077,7 @@ class Postgres extends ADODB_base {
 
 	/**
 	 * Return all tables in current database (and schema).
-	 * When $all=false, result includes: relname, display_name (with [P]/[Pc]/[P+Pc] prefix),
+	 * When $all=false, result includes: relname, display_name (↳ prefix for child partitions),
 	 * relkind ('r'=ordinary, 'p'=partitioned parent), relispartition (bool),
 	 * relowner, relcomment, reltuples, tablespace.
 	 * @param $all True to fetch all tables, false for just in current schema
@@ -1096,9 +1096,7 @@ class Postgres extends ADODB_base {
 		} else {
 			$sql = "SELECT c.relname,
 						CASE
-							WHEN c.relkind = 'p' AND c.relispartition IS TRUE THEN '[P+Pc] ' || c.relname
-							WHEN c.relkind = 'p'                              THEN '[P] '    || c.relname
-							WHEN c.relispartition IS TRUE                     THEN '[Pc] '   || c.relname
+							WHEN c.relispartition IS TRUE THEN '↳ ' || c.relname
 							ELSE c.relname
 						END AS display_name,
 						c.relkind,
