@@ -1096,7 +1096,11 @@ class Postgres extends ADODB_base {
 		} else {
 			$sql = "SELECT c.relname,
 						CASE
-							WHEN c.relispartition IS TRUE THEN '↳ ' || c.relname
+							WHEN c.relispartition IS TRUE
+								THEN '↳ ' || c.relname
+							WHEN c.relispartition IS NOT TRUE
+								AND EXISTS (SELECT 1 FROM pg_catalog.pg_inherits WHERE inhrelid = c.oid)
+								THEN '↪ ' || c.relname
 							ELSE c.relname
 						END AS display_name,
 						c.relkind,
@@ -1234,6 +1238,67 @@ class Postgres extends ADODB_base {
 				AND pi.inhparent = (SELECT oid from pg_catalog.pg_class WHERE relname='{$table}'
 					AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = '{$c_schema}'))
 		";
+
+		return $this->selectSet($sql);
+	}
+
+	/**
+	 * Finds child tables that inherit from $table via legacy inheritance only.
+	 * Excludes declarative partition children (relispartition IS NOT TRUE).
+	 * @param $table The parent table name
+	 * @return A recordset with columns: nspname, relname
+	 */
+	function getInheritanceChildren($table) {
+		$c_schema = $this->_schema;
+		$this->clean($c_schema);
+		$this->clean($table);
+
+		$sql = "
+			SELECT
+				cn.nspname,
+				cc.relname
+			FROM pg_catalog.pg_inherits i
+			JOIN pg_catalog.pg_class cc ON cc.oid = i.inhrelid
+			JOIN pg_catalog.pg_namespace cn ON cn.oid = cc.relnamespace
+			WHERE i.inhparent = (
+				SELECT oid FROM pg_catalog.pg_class
+				WHERE relname = '{$table}'
+				AND relnamespace = (
+					SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = '{$c_schema}'
+				)
+			)
+			AND cc.relispartition IS NOT TRUE
+			ORDER BY cc.relname";
+
+		return $this->selectSet($sql);
+	}
+
+	/**
+	 * Finds parent tables that $table inherits from via legacy inheritance only.
+	 * Excludes declarative partition parents (filters to parent relkind = 'r').
+	 * Supports multiple-parent inheritance (returns all parents ordered by inhseqno).
+	 * @param $table The child table name
+	 * @return A recordset with columns: nspname, relname
+	 */
+	function getInheritanceParents($table) {
+		$c_schema = $this->_schema;
+		$this->clean($c_schema);
+		$this->clean($table);
+
+		$sql = "
+			SELECT
+				pn.nspname,
+				pc.relname
+			FROM pg_catalog.pg_inherits i
+			JOIN pg_catalog.pg_class cc ON cc.oid = i.inhrelid
+			JOIN pg_catalog.pg_namespace cn ON cn.oid = cc.relnamespace
+			JOIN pg_catalog.pg_class pc ON pc.oid = i.inhparent
+			JOIN pg_catalog.pg_namespace pn ON pn.oid = pc.relnamespace
+			WHERE cc.relname = '{$table}'
+			AND cn.nspname = '{$c_schema}'
+			AND cc.relispartition IS NOT TRUE
+			AND pc.relkind = 'r'
+			ORDER BY i.inhseqno";
 
 		return $this->selectSet($sql);
 	}

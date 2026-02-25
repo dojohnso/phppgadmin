@@ -680,7 +680,45 @@
 			}
 		}
 
-		// --- End partition support ---
+		// If this is a legacy inheritance parent, show inherited child tables
+	if (isset($tdata->fields['relkind']) && $tdata->fields['relkind'] === 'r') {
+		$inheritChildren = $data->getInheritanceChildren($_REQUEST['table']);
+		if ($inheritChildren && $inheritChildren->recordCount() > 0) {
+			echo "<h3>Inherited Tables</h3>\n";
+			echo "<table class=\"data\">\n";
+			echo "<tr><th class=\"data\">Table</th></tr>\n";
+			$rowclass = 1;
+			while (!$inheritChildren->EOF) {
+				$cname   = htmlspecialchars($inheritChildren->fields['relname']);
+				$cschema = htmlspecialchars($inheritChildren->fields['nspname']);
+				echo "<tr class=\"data{$rowclass}\">\n";
+				echo "\t<td><a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($cschema)."&amp;table=".urlencode($cname)."\">&#x21AA; {$cname}</a></td>\n";
+				echo "</tr>\n";
+				$rowclass = ($rowclass == 1) ? 2 : 1;
+				$inheritChildren->moveNext();
+			}
+			echo "</table>\n";
+		}
+	}
+
+	// If this table has legacy inheritance parents, show back-links
+	$isDeclarativeChild = isset($tdata->fields['relispartition'])
+		&& ($tdata->fields['relispartition'] === 't' || $tdata->fields['relispartition'] === true);
+	if (!$isDeclarativeChild) {
+		$inheritParents = $data->getInheritanceParents($_REQUEST['table']);
+		if ($inheritParents && $inheritParents->recordCount() > 0) {
+			$links = array();
+			while (!$inheritParents->EOF) {
+				$pname   = htmlspecialchars($inheritParents->fields['relname']);
+				$pschema = htmlspecialchars($inheritParents->fields['nspname']);
+				$links[] = "<a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($pschema)."&amp;table=".urlencode($pname)."\">{$pname}</a>";
+				$inheritParents->moveNext();
+			}
+			echo "<p class=\"comment\"><strong>Inherits from:</strong> " . implode(', ', $links) . "</p>\n";
+		}
+	}
+
+	// --- End partition support ---
 
 		$navlinks = array (
 			'browse' => array (
