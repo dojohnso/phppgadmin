@@ -169,5 +169,3 @@
 	 *****************************************/
 
 	$conf['version'] = 19;
-
-$conf['servers'][1] = $conf['servers'][0]; $conf['servers'][1]['desc'] = 'devqa'; $conf['servers'][1]['host'] = 'rtvx-devqa-devawsrtvxds01.cgvhtm8edpky.us-east-1.rds.amazonaws.com';
