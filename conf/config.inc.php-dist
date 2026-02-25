@@ -11,11 +11,11 @@
 	// indexed from zero upwards.
 
 	// Display name for the server on the login screen
-    $conf['servers'][0]['desc'] = 'local dev 16';
+    $conf['servers'][0]['desc'] = 'local db';
 
     // Hostname or IP address for server.  Use '' for UNIX domain socket.
     // use 'localhost' for TCP/IP connection on this computer
-    $conf['servers'][0]['host'] = 'rxtracker-db';
+    $conf['servers'][0]['host'] = 'localhost';
 
     // Database port on server (5432 is the PostgreSQL default)
     $conf['servers'][0]['port'] = 5432;
