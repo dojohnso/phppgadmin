@@ -625,6 +625,63 @@
 
 		$misc->printTable($attrs, $columns, $actions, 'tblproperties-tblproperties', null, 'attPre');
 
+		// --- Partition support (PG10+) ---
+
+		// If this is a partitioned parent table, show partition info and children
+		if (isset($tdata->fields['relkind']) && $tdata->fields['relkind'] === 'p') {
+			$partInfo = $data->getPartitionInfo($_REQUEST['table']);
+			if ($partInfo && $partInfo->recordCount() > 0) {
+				$method = htmlspecialchars($partInfo->fields['partition_method']);
+				$key    = htmlspecialchars($partInfo->fields['partition_key']);
+				echo "<h3>Partitions</h3>\n";
+				echo "<p><strong>Method:</strong> {$method} &nbsp; <strong>Key:</strong> <code>{$key}</code></p>\n";
+
+				$partitions = $data->getTablePartitions($_REQUEST['table']);
+				if ($partitions && $partitions->recordCount() > 0) {
+					echo "<table class=\"data\">\n";
+					echo "<tr>\n";
+					echo "\t<th class=\"data\">Partition</th>\n";
+					echo "\t<th class=\"data\">Bounds</th>\n";
+					echo "\t<th class=\"data\">Estimated Rows</th>\n";
+					echo "</tr>\n";
+					$rowclass = 1;
+					while (!$partitions->EOF) {
+						$pname   = htmlspecialchars($partitions->fields['partition_name']);
+						$pschema = htmlspecialchars($partitions->fields['schemaname']);
+						$pbounds = htmlspecialchars($partitions->fields['partition_bounds']);
+						$prows   = ($partitions->fields['estimated_rows'] == -1)
+							? '<em>not analyzed</em>'
+							: htmlspecialchars($partitions->fields['estimated_rows']);
+						echo "<tr class=\"data{$rowclass}\">\n";
+						echo "\t<td><a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($pschema)."&amp;table=".urlencode($pname)."\">[Pc] {$pname}</a></td>\n";
+						echo "\t<td><code>{$pbounds}</code></td>\n";
+						echo "\t<td>{$prows}</td>\n";
+						echo "</tr>\n";
+						$rowclass = ($rowclass == 1) ? 2 : 1;
+						$partitions->moveNext();
+					}
+					echo "</table>\n";
+				} else {
+					echo "<p><em>No partitions found.</em></p>\n";
+				}
+			}
+		}
+
+		// If this is a child partition, show a back-link to parent
+		if (isset($tdata->fields['relispartition'])
+			&& ($tdata->fields['relispartition'] === 't' || $tdata->fields['relispartition'] === true)) {
+			$parent = $data->getPartitionParent($_REQUEST['table']);
+			if ($parent && $parent->recordCount() > 0) {
+				$parentTable  = htmlspecialchars($parent->fields['parent_table']);
+				$parentSchema = htmlspecialchars($parent->fields['parent_schema']);
+				echo "<p class=\"comment\"><strong>Partition of:</strong> ";
+				echo "<a href=\"tblproperties.php?{$misc->href}&amp;schema=".urlencode($parentSchema)."&amp;table=".urlencode($parentTable)."\">";
+				echo "[P] {$parentTable}</a></p>\n";
+			}
+		}
+
+		// --- End partition support ---
+
 		$navlinks = array (
 			'browse' => array (
 				'attr'=> array (

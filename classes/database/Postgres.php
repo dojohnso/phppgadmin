@@ -1046,9 +1046,11 @@ class Postgres extends ADODB_base {
 	}
 
 	/**
-	 * Returns table information
+	 * Returns table information for a single table.
+	 * Accepts both ordinary tables (relkind='r') and partitioned parent tables (relkind='p').
 	 * @param $table The name of the table
-	 * @return A recordset
+	 * @return A recordset with fields: relname, nspname, relowner, relcomment, tablespace,
+	 *         relkind ('r'=ordinary, 'p'=partitioned parent), relispartition (bool)
 	 */
 	function getTable($table) {
 		$c_schema = $this->_schema;
@@ -1059,11 +1061,13 @@ class Postgres extends ADODB_base {
 			SELECT
 			  c.relname, n.nspname, u.usename AS relowner,
 			  pg_catalog.obj_description(c.oid, 'pg_class') AS relcomment,
-			  (SELECT spcname FROM pg_catalog.pg_tablespace pt WHERE pt.oid=c.reltablespace) AS tablespace
+			  (SELECT spcname FROM pg_catalog.pg_tablespace pt WHERE pt.oid=c.reltablespace) AS tablespace,
+			  c.relkind,
+			  c.relispartition
 			FROM pg_catalog.pg_class c
 			     LEFT JOIN pg_catalog.pg_user u ON u.usesysid = c.relowner
 			     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-			WHERE c.relkind = 'r'
+			WHERE c.relkind IN ('r', 'p')
 			      AND n.nspname = '{$c_schema}'
 			      AND n.oid = c.relnamespace
 			      AND c.relname = '{$table}'";
@@ -1072,27 +1076,40 @@ class Postgres extends ADODB_base {
 	}
 
 	/**
-	 * Return all tables in current database (and schema)
+	 * Return all tables in current database (and schema).
+	 * When $all=false, result includes: relname, display_name (with [P]/[Pc]/[P+Pc] prefix),
+	 * relkind ('r'=ordinary, 'p'=partitioned parent), relispartition (bool),
+	 * relowner, relcomment, reltuples, tablespace.
 	 * @param $all True to fetch all tables, false for just in current schema
-	 * @return All tables, sorted alphabetically
+	 * @return All tables, sorted alphabetically by relname
 	 */
 	function getTables($all = false) {
 		$c_schema = $this->_schema;
 		$this->clean($c_schema);
 		if ($all) {
 			// Exclude pg_catalog and information_schema tables
-			$sql = "SELECT schemaname AS nspname, tablename AS relname, tableowner AS relowner
+			$sql = "SELECT schemaname AS nspname, tablename AS relname, tableowner AS relowner,
+					tablename AS display_name
 					FROM pg_catalog.pg_tables
 					WHERE schemaname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
 					ORDER BY schemaname, tablename";
 		} else {
-			$sql = "SELECT c.relname, pg_catalog.pg_get_userbyid(c.relowner) AS relowner,
+			$sql = "SELECT c.relname,
+						CASE
+							WHEN c.relkind = 'p' AND c.relispartition IS TRUE THEN '[P+Pc] ' || c.relname
+							WHEN c.relkind = 'p'                              THEN '[P] '    || c.relname
+							WHEN c.relispartition IS TRUE                     THEN '[Pc] '   || c.relname
+							ELSE c.relname
+						END AS display_name,
+						c.relkind,
+						c.relispartition,
+						pg_catalog.pg_get_userbyid(c.relowner) AS relowner,
 						pg_catalog.obj_description(c.oid, 'pg_class') AS relcomment,
-						reltuples::bigint,
+						CASE WHEN reltuples < 0 THEN 'not analyzed' ELSE reltuples::bigint::text END AS reltuples,
 						(SELECT spcname FROM pg_catalog.pg_tablespace pt WHERE pt.oid=c.reltablespace) AS tablespace
 					FROM pg_catalog.pg_class c
 					LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-					WHERE c.relkind = 'r'
+					WHERE c.relkind IN ('r', 'p')
 					AND nspname='{$c_schema}'
 					ORDER BY c.relname";
 		}
@@ -1219,6 +1236,100 @@ class Postgres extends ADODB_base {
 				AND pi.inhparent = (SELECT oid from pg_catalog.pg_class WHERE relname='{$table}'
 					AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = '{$c_schema}'))
 		";
+
+		return $this->selectSet($sql);
+	}
+
+	/**
+	 * Returns partition method and key columns for a partitioned table (relkind='p').
+	 * Returns empty result set if the table is not a partitioned parent.
+	 * @param $table The table name
+	 * @return RecordSet with fields: partition_method (RANGE|LIST|HASH), partition_key (full key definition including expressions)
+	 */
+	function getPartitionInfo($table) {
+		$c_schema = $this->_schema;
+		$this->clean($c_schema);
+		$this->clean($table);
+
+		$sql = "
+			SELECT
+				CASE pt.partstrat
+					WHEN 'r' THEN 'RANGE'
+					WHEN 'l' THEN 'LIST'
+					WHEN 'h' THEN 'HASH'
+					ELSE pt.partstrat::text
+				END AS partition_method,
+				regexp_replace(
+					pg_catalog.pg_get_partkeydef(c.oid),
+					'^(RANGE|LIST|HASH)\\s+',
+					''
+				) AS partition_key
+			FROM pg_catalog.pg_partitioned_table pt
+			JOIN pg_catalog.pg_class c ON c.oid = pt.partrelid
+			JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+			WHERE c.relname = '{$table}'
+			AND n.nspname = '{$c_schema}'";
+
+		return $this->selectSet($sql);
+	}
+
+	/**
+	 * Returns child partition tables for a partitioned parent table.
+	 * Returns empty result set if the table has no partitions.
+	 * @param $table The partitioned parent table name
+	 * @return RecordSet with fields: partition_name, schemaname, partition_bounds, estimated_rows
+	 */
+	function getTablePartitions($table) {
+		$c_schema = $this->_schema;
+		$this->clean($c_schema);
+		$this->clean($table);
+
+		$sql = "
+			SELECT
+				c.relname AS partition_name,
+				n.nspname AS schemaname,
+				pg_catalog.pg_get_expr(c.relpartbound, c.oid, true) AS partition_bounds,
+				c.reltuples::bigint AS estimated_rows
+			FROM pg_catalog.pg_inherits i
+			JOIN pg_catalog.pg_class c ON c.oid = i.inhrelid
+			JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+			WHERE i.inhparent = (
+				SELECT oid FROM pg_catalog.pg_class
+				WHERE relname = '{$table}'
+				AND relnamespace = (
+					SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = '{$c_schema}'
+				)
+			)
+			ORDER BY c.relname";
+
+		return $this->selectSet($sql);
+	}
+
+	/**
+	 * Returns the parent partitioned table for a child partition.
+	 * Returns empty result set if the table is not a partition child.
+	 * Native partitioning guarantees exactly one parent (LIMIT 1 enforced).
+	 * @param $table The child partition table name
+	 * @return RecordSet with fields: parent_schema, parent_table
+	 */
+	function getPartitionParent($table) {
+		$c_schema = $this->_schema;
+		$this->clean($c_schema);
+		$this->clean($table);
+
+		$sql = "
+			SELECT
+				pn.nspname AS parent_schema,
+				pc.relname AS parent_table
+			FROM pg_catalog.pg_inherits i
+			JOIN pg_catalog.pg_class cc ON cc.oid = i.inhrelid
+			JOIN pg_catalog.pg_namespace cn ON cn.oid = cc.relnamespace
+			JOIN pg_catalog.pg_class pc ON pc.oid = i.inhparent
+			JOIN pg_catalog.pg_namespace pn ON pn.oid = pc.relnamespace
+			WHERE cc.relname = '{$table}'
+			AND cn.nspname = '{$c_schema}'
+			AND cc.relispartition IS TRUE
+			LIMIT 1";
 
 		return $this->selectSet($sql);
 	}
@@ -2495,7 +2606,7 @@ class Postgres extends ADODB_base {
 			// Build clause
 			if (count($values) > 0) {
 				// Escape all field names
-				$fields = array_map(array('Postgres','fieldClean'), $fields);
+				$this->fieldArrayClean($fields);
 				$f_schema = $this->_schema;
 				$this->fieldClean($table);
 				$this->fieldClean($f_schema);

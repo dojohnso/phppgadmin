@@ -742,7 +742,7 @@
 		$columns = array(
 			'table' => array(
 				'title' => $lang['strtable'],
-				'field' => field('relname'),
+				'field' => field('display_name'),
 				'url'	=> "redirect.php?subject=table&amp;{$misc->href}&amp;",
 				'vars'  => array('table' => 'relname'),
 			),
@@ -757,7 +757,7 @@
 			'tuples' => array(
 				'title' => $lang['strestimatedrowcount'],
 				'field' => field('reltuples'),
-				'type'  => 'numeric'
+				'params' => array('align' => 'right'),
 			),
 			'actions' => array(
 				'title' => $lang['stractions'],
@@ -944,7 +944,7 @@
 		$reqvars = $misc->getRequestVars('table');
 
 		$attrs = array(
-			'text'   => field('relname'),
+			'text'   => field('display_name'),
 			'icon'   => 'Table',
 			'iconAction' => url('display.php',
 							$reqvars,
