@@ -155,18 +155,18 @@ Unless you are very careful, you might end up with a tuple having
 a different OID if a database must be reloaded. */
 	function _insertid($table,$column)
 	{
-		if (!is_resource($this->_resultid) || get_resource_type($this->_resultid) !== 'pgsql result') return false;
-		$oid = pg_getlastoid($this->_resultid);
-		// to really return the id, we need the table and column-name, else we can only return the oid != id
-		return empty($table) || empty($column) ? $oid : $this->GetOne("SELECT $column FROM $table WHERE oid=".(int)$oid);
+		// pg_getlastoid() was removed in PHP 8.1; user-table OIDs gone in PG12+.
+		// Sequence-based IDs are retrieved via RETURNING in modern PG.
+		return false;
 	}
 
 // I get this error with PHP before 4.0.6 - jlim
 // Warning: This compilation does not support pg_cmdtuples() in adodb-postgres.inc.php on line 44
    function _affectedrows()
    {
-   		if (!is_resource($this->_resultid) || get_resource_type($this->_resultid) !== 'pgsql result') return false;
-	   	return pg_cmdtuples($this->_resultid);
+   		// PHP 8.1+ returns PgSql\Result objects, not resources; pg_affected_rows() handles both.
+   		if (!$this->_resultid) return 0;
+	   	return pg_affected_rows($this->_resultid);
    }
    
 	
@@ -788,8 +788,8 @@ WHERE (c2.relname=\'%s\' or c2.relname=lower(\'%s\'))';
 		}
 		// check if no data returned, then no need to create real recordset
 		if ($rez && pg_numfields($rez) <= 0) {
-			if (is_resource($this->_resultid) && get_resource_type($this->_resultid) === 'pgsql result') {
-				pg_freeresult($this->_resultid);
+			if ($this->_resultid) {
+				pg_free_result($this->_resultid);
 			}
 			$this->_resultid = $rez;
 			return true;
