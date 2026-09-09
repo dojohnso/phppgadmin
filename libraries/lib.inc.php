@@ -16,7 +16,10 @@
 	$appName = 'phpPgAdmin';
 
 	// Application version
-	$appVersion = '7.13.0';
+	// SemVer build metadata (+dj.N) tags this fork's iterations without
+	// colliding with upstream releases. Bump the +dj.N suffix when this fork
+	// changes; reset to +dj.1 when rebasing onto a new upstream version.
+	$appVersion = '7.13.0+dj.1';
 
 	// PostgreSQL and PHP minimum version
 	$postgresqlMinVer = '7.4';

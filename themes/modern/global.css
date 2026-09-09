@@ -31,16 +31,16 @@
 body {
 	background-color: var(--ppa-bg);
 	color: var(--ppa-text);
-	margin: 6px;
+	margin: 4px;
 	font-family: var(--ppa-font);
 	padding: 0;
-	font-size: 13px;
-	line-height: 1.45;
+	font-size: 12px;
+	line-height: 1.35;
 }
 body.browser {
 	background-color: var(--ppa-surface-alt);
 	font-family: var(--ppa-font);
-	font-size: 13px;
+	font-size: 12px;
 	border-right: 1px solid var(--ppa-border);
 }
 body.bottombar {
@@ -49,28 +49,33 @@ body.bottombar {
 	margin: 0;
 	padding: 0;
 	font-family: var(--ppa-font);
-	font-size: 12px;
+	font-size: 11px;
 	text-align: left;
+}
+
+/* Compact all table cells — matches default's density */
+td, th {
+	padding: 2px 6px;
 }
 
 h2 {
 	color: var(--ppa-accent);
-	font-size: 15px;
+	font-size: 14px;
 	font-family: var(--ppa-font);
 	font-weight: 600;
 	border: 1px solid var(--ppa-border);
 	background-color: var(--ppa-surface);
-	padding: 6px 12px;
-	margin: 0 0 10px 0;
+	padding: 4px 10px;
+	margin: 0 0 8px 0;
 	border-radius: var(--ppa-radius);
 	border-left: 3px solid var(--ppa-accent);
 }
 h3 {
 	color: var(--ppa-accent-hover);
-	font-size: 13px;
+	font-size: 12px;
 	font-family: var(--ppa-font);
 	font-weight: 600;
-	margin: 12px 0 6px;
+	margin: 10px 0 4px;
 }
 
 /** MESSAGES / ERRORS */
@@ -104,11 +109,12 @@ th.data {
 	color: var(--ppa-text);
 	background-color: var(--ppa-accent-soft);
 	font-family: var(--ppa-font);
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: 600;
-	padding: 5px 8px;
+	padding: 3px 6px;
 	border-bottom: 1px solid var(--ppa-border-strong);
 	text-align: left;
+	white-space: nowrap;
 }
 th.data a:active, th.data a:link, th.data a:visited, th.data a:hover {
 	font-weight: 600;
@@ -139,7 +145,7 @@ tr.data1:hover, tr.data2:hover, tr.data3:hover {
 }
 .row3, .data3 { background-color: var(--ppa-surface); }
 
-/** TOPBAR (server/host/user chip strip) */
+/** TOPBAR (server/host/user chip strip + top-right nav: SQL | History | Find | Log) */
 td.topbar,
 .topbar,
 .topbar * {
@@ -152,15 +158,64 @@ td.topbar,
 .topbar {
 	border: 1px solid var(--ppa-accent);
 	border-radius: var(--ppa-radius);
-	padding: 4px 10px;
+	padding: 3px 8px 3px 10px;
+}
+/* Topbar's inner table shouldn't add cell padding on top of the topbar's own —
+   otherwise the top-right toplinks (SQL | History | Find | Logout) float in
+   from the right edge. */
+.topbar table { border-collapse: collapse; }
+.topbar table td { padding: 0; }
+.topbar ul.toplink {
+	margin: 0;
+	padding: 0;
+	/* .topbar * sets text-align:left above; the toplinks need to override
+	   back to right so they honor the containing td's text-align:right. */
+	text-align: right;
 }
 .topbar .platform, .topbar .host, .topbar .username {
 	font-weight: 600;
 }
-.topbar, .trail { margin-bottom: 6px; }
+.topbar, .trail { margin-bottom: 4px; }
 .topbar, .trail, .tab {
-	padding: 4px 10px;
+	padding: 3px 10px;
 	font-size: 12px;
+}
+/* Force topbar links white — they'd otherwise inherit link-blue and vanish */
+.topbar a,
+.topbar a:link,
+.topbar a:visited,
+.topbar a:active,
+td.topbar a,
+td.topbar a:link,
+td.topbar a:visited,
+td.topbar a:active {
+	color: #fff;
+	text-decoration: none;
+	font-weight: 500;
+}
+.topbar a:hover,
+td.topbar a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+/* Higher-specificity override — the generic `ul.toplink li a:visited` rule
+   below repaints links accent-blue, which vanishes on the accent-blue topbar.
+   Match its structure with `.topbar` prepended so this wins the cascade. */
+.topbar ul.toplink li a,
+.topbar ul.toplink li a:link,
+.topbar ul.toplink li a:visited,
+.topbar ul.toplink li a:active {
+	color: #fff;
+	text-decoration: none;
+	font-weight: 500;
+}
+.topbar ul.toplink li a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+/* Also lighten the pipe separators so they're visible against the accent bg */
+.topbar ul.toplink li {
+	border-left-color: rgba(255, 255, 255, 0.35);
 }
 
 /** BREADCRUMB TRAIL + TABS */
@@ -189,22 +244,37 @@ table.tabs {
 .tabs .active a:visited { color: #fff; }
 .tab .icon { display: block; margin: 0 auto 2px; }
 
-/** BUTTONS (submit-like table cells) */
+/** ACTION CELLS (Drop / Privileges / Alter etc — plain text-link style) */
 td.opbutton1, td.opbutton2 {
-	color: #fff;
-	background-color: var(--ppa-accent);
-	border: 1px solid var(--ppa-accent-hover);
-	border-radius: var(--ppa-radius);
+	color: var(--ppa-text);
+	background-color: transparent;
+	border: none;
 	cursor: pointer;
 	font-family: var(--ppa-font);
-	font-size: 12px;
-	font-weight: 600;
-	padding: 4px 10px;
+	font-size: 11px;
+	padding: 2px 8px;
 	text-align: center;
+	white-space: nowrap;
 }
-td.opbutton1:hover, td.opbutton2:hover {
-	background-color: var(--ppa-accent-hover);
+td.opbutton1 a,
+td.opbutton1 a:link,
+td.opbutton1 a:visited,
+td.opbutton2 a,
+td.opbutton2 a:link,
+td.opbutton2 a:visited {
+	color: var(--ppa-link);
+	font-weight: 500;
+	text-decoration: none;
 }
+td.opbutton1 a:hover,
+td.opbutton2 a:hover {
+	color: var(--ppa-link-hover);
+	text-decoration: underline;
+}
+/* Alternate the action-cell background with its row so the strip doesn't
+   feel disconnected from the row it belongs to. */
+tr.data1 td.opbutton1, tr.data1 td.opbutton2 { background-color: var(--ppa-surface); }
+tr.data2 td.opbutton1, tr.data2 td.opbutton2 { background-color: var(--ppa-surface-row); }
 
 /** GENERIC form controls — style what the app already renders */
 input[type="text"],
@@ -367,24 +437,24 @@ div.fk {
 	padding: 6px;
 }
 
-/** LOGO (nav frame header) — text-based, no PNG needed */
+/** LOGO (nav frame header) — flat accent bar, continues visually into topbar */
 div.logo {
-	background: linear-gradient(135deg, var(--ppa-accent) 0%, var(--ppa-accent-hover) 100%);
+	background: var(--ppa-accent);
 	color: #fff;
-	margin: 0;
+	margin: 0 0 4px 0;
 	padding: 0;
 	font-family: var(--ppa-font);
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
-	letter-spacing: 0.3px;
+	letter-spacing: 0.2px;
 	border: none;
-	border-bottom: 1px solid rgba(0,0,0,0.15);
-	margin-bottom: 4px;
-	height: 42px;
-	line-height: 42px;
-	text-align: center;
+	height: 34px;
+	line-height: 34px;
+	text-align: left;
+	padding-left: 12px;
 	background-image: none;
 	background-repeat: no-repeat;
+	position: relative;
 }
 div.logo a,
 div.logo a:link,
@@ -394,19 +464,27 @@ div.logo a:visited {
 	color: #fff;
 	text-decoration: none;
 	font-weight: 600;
+	padding-right: 32px; /* leave room for refreshTree float */
 }
 div.logo a:hover {
 	color: #fff;
 	text-decoration: none;
-	background: rgba(255,255,255,0.06);
 }
-
-/** REFRESH TREE ICON */
+/* Push the refresh icon into the accent bar so it sits neatly at right */
 .refreshTree {
 	float: right;
 	text-align: right;
-	padding: 4px 6px;
+	padding: 6px 8px 0 0;
+	margin-top: -34px;      /* overlay onto the logo bar */
+	height: 34px;
+	position: relative;
+	z-index: 2;
 }
+.refreshTree img {
+	filter: brightness(0) invert(1); /* white-out the icon so it reads on accent bg */
+	opacity: 0.85;
+}
+.refreshTree a:hover img { opacity: 1; }
 
 /** SYNTAX HIGHLIGHTING (override the shared defaults with palette-aware) */
 .comment { color: #6a737d; font-style: italic; }

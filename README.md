@@ -39,3 +39,12 @@ For databases using pre-declarative trigger-based inheritance (`INHERITS`):
 - Updated minimum PHP version requirement to 8.0
 - Added PG14/15/16 routing in `Connection.php` and new `Postgres14.php`/`Postgres15.php` subclasses
 - Replaced deprecated `pg_escape_string()` calls (no connection argument) with `pg_escape_string($conn, ...)`
+
+### UI Modernization
+
+- **New "Modern" theme** (`themes/modern/`) — a lighter, Postgres-brand-blue palette replacing the classic tan/brown look. System typography (native OS font stack), compact data tables, and CSS custom properties for one-line palette tweaks. Set as the default in `conf/config.inc.php-dist`; the classic `default`, `cappuccino`, `bootstrap`, and `gotar` themes remain available.
+- **Frame-navigation loading indicator** — a small CSS spinner appears in the browser (nav) frame whenever a link click triggers frame navigation, and hides when the detail frame's `onload` fires (with a 15s safety timeout). No image assets, no jQuery — pure CSS keyframe. Implemented as a shim script in `index.php` passed through `printHeader()`; no changes to `browser.php` or per-page templates.
+
+### Versioning
+
+This fork uses SemVer build-metadata (`+dj.N`) so it never collides with an upstream release number. Current version: **`7.13.0+dj.1`**. The `+dj.N` suffix increments per fork iteration and resets to `+dj.1` on rebase onto a newer upstream. This version string surfaces in the UI header, browser title, and in PostgreSQL's `pg_stat_activity.application_name` (via `PGAPPNAME`).
