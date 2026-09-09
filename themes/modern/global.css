@@ -1,0 +1,421 @@
+@import url(../global.css);
+/**
+ * Modern theme — Postgres blue palette, lighter surfaces, system typography.
+ * Drop-in replacement for the classic "default" tan/brown theme.
+ */
+
+:root {
+	--ppa-bg:            #f7fafc;
+	--ppa-surface:       #ffffff;
+	--ppa-surface-alt:   #eef3f8;
+	--ppa-surface-row:   #f0f5fa;
+	--ppa-border:        #dbe4ec;
+	--ppa-border-strong: #b8c8d8;
+	--ppa-text:          #1f2933;
+	--ppa-text-muted:    #52606d;
+	--ppa-accent:        #336791; /* Postgres brand blue */
+	--ppa-accent-hover:  #2b5878;
+	--ppa-accent-soft:   #e2ecf5;
+	--ppa-link:          #336791;
+	--ppa-link-hover:    #4a90e2;
+	--ppa-danger:        #b3261e;
+	--ppa-warning:       #b26a00;
+	--ppa-radius:        4px;
+	--ppa-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+	            "Helvetica Neue", Arial, sans-serif;
+	--ppa-mono: ui-monospace, "SF Mono", Menlo, Consolas,
+	            "DejaVu Sans Mono", monospace;
+}
+
+/** ELEMENTS */
+body {
+	background-color: var(--ppa-bg);
+	color: var(--ppa-text);
+	margin: 6px;
+	font-family: var(--ppa-font);
+	padding: 0;
+	font-size: 13px;
+	line-height: 1.45;
+}
+body.browser {
+	background-color: var(--ppa-surface-alt);
+	font-family: var(--ppa-font);
+	font-size: 13px;
+	border-right: 1px solid var(--ppa-border);
+}
+body.bottombar {
+	background-color: var(--ppa-accent);
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	text-align: left;
+}
+
+h2 {
+	color: var(--ppa-accent);
+	font-size: 15px;
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	border: 1px solid var(--ppa-border);
+	background-color: var(--ppa-surface);
+	padding: 6px 12px;
+	margin: 0 0 10px 0;
+	border-radius: var(--ppa-radius);
+	border-left: 3px solid var(--ppa-accent);
+}
+h3 {
+	color: var(--ppa-accent-hover);
+	font-size: 13px;
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	margin: 12px 0 6px;
+}
+
+/** MESSAGES / ERRORS */
+table.error, table.error td {
+	background-color: #fdecea;
+	border-color: #f5c2be;
+	color: var(--ppa-danger);
+}
+p.message { color: var(--ppa-accent); font-weight: 500; }
+p.errmsg  { color: var(--ppa-danger); }
+
+/** NAV BAR (tab-strip under trail) */
+table.navbar { background-color: var(--ppa-surface-alt); }
+table.navbar td {
+	height: 26px;
+	color: var(--ppa-text);
+	background-color: var(--ppa-surface);
+	text-align: center;
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	font-weight: 600;
+	border: 1px solid var(--ppa-border);
+}
+table.navbar td.active {
+	background-color: var(--ppa-accent);
+	color: #fff;
+}
+
+/** DATA TABLES */
+th.data {
+	color: var(--ppa-text);
+	background-color: var(--ppa-accent-soft);
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	font-weight: 600;
+	padding: 5px 8px;
+	border-bottom: 1px solid var(--ppa-border-strong);
+	text-align: left;
+}
+th.data a:active, th.data a:link, th.data a:visited, th.data a:hover {
+	font-weight: 600;
+	color: var(--ppa-accent);
+}
+td.dat {
+	color: var(--ppa-text);
+	text-align: center;
+}
+th.required { text-decoration: underline; }
+
+/** ROWS */
+tr.data1, tr.data2, tr.data3 {
+	color: var(--ppa-text);
+	font-family: var(--ppa-font);
+	font-size: 12px;
+}
+tr.data1:hover, tr.data2:hover, tr.data3:hover {
+	background-color: var(--ppa-accent-soft);
+}
+.row1, .data1 {
+	background-color: var(--ppa-surface);
+	text-align: left;
+}
+.row2, .data2 {
+	background-color: var(--ppa-surface-row);
+	text-align: left;
+}
+.row3, .data3 { background-color: var(--ppa-surface); }
+
+/** TOPBAR (server/host/user chip strip) */
+td.topbar,
+.topbar,
+.topbar * {
+	background-color: var(--ppa-accent);
+	color: #fff;
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	text-align: left;
+}
+.topbar {
+	border: 1px solid var(--ppa-accent);
+	border-radius: var(--ppa-radius);
+	padding: 4px 10px;
+}
+.topbar .platform, .topbar .host, .topbar .username {
+	font-weight: 600;
+}
+.topbar, .trail { margin-bottom: 6px; }
+.topbar, .trail, .tab {
+	padding: 4px 10px;
+	font-size: 12px;
+}
+
+/** BREADCRUMB TRAIL + TABS */
+.trail, .tab {
+	border: 1px solid var(--ppa-border);
+	background-color: var(--ppa-surface);
+	border-radius: var(--ppa-radius);
+}
+.trail .crumb { background-color: transparent; }
+.crumb, .tab { vertical-align: top; }
+.crumb .icon { vertical-align: middle; margin: 0 3px; }
+
+table.tabs {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 8px;
+}
+.tab { text-align: center; }
+.tabs .active {
+	background-color: var(--ppa-accent);
+	color: #fff;
+	border-color: var(--ppa-accent);
+}
+.tabs .active a,
+.tabs .active a:link,
+.tabs .active a:visited { color: #fff; }
+.tab .icon { display: block; margin: 0 auto 2px; }
+
+/** BUTTONS (submit-like table cells) */
+td.opbutton1, td.opbutton2 {
+	color: #fff;
+	background-color: var(--ppa-accent);
+	border: 1px solid var(--ppa-accent-hover);
+	border-radius: var(--ppa-radius);
+	cursor: pointer;
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	font-weight: 600;
+	padding: 4px 10px;
+	text-align: center;
+}
+td.opbutton1:hover, td.opbutton2:hover {
+	background-color: var(--ppa-accent-hover);
+}
+
+/** GENERIC form controls — style what the app already renders */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="email"],
+select,
+textarea {
+	font-family: var(--ppa-font);
+	font-size: 13px;
+	color: var(--ppa-text);
+	background: var(--ppa-surface);
+	border: 1px solid var(--ppa-border-strong);
+	border-radius: var(--ppa-radius);
+	padding: 3px 6px;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+	outline: none;
+	border-color: var(--ppa-accent);
+	box-shadow: 0 0 0 2px var(--ppa-accent-soft);
+}
+input[type="submit"],
+input[type="button"],
+button {
+	font-family: var(--ppa-font);
+	font-size: 12px;
+	font-weight: 600;
+	color: #fff;
+	background: var(--ppa-accent);
+	border: 1px solid var(--ppa-accent-hover);
+	border-radius: var(--ppa-radius);
+	padding: 4px 12px;
+	cursor: pointer;
+}
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover {
+	background: var(--ppa-accent-hover);
+}
+
+/** LINK MENUS (top/nav pipe-separated lists) */
+ul.toplink, ul.navlink {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+ul.navlink { margin: 16px 0; }
+ul.toplink li, ul.navlink li {
+	display: inline;
+	border-left: 1px solid var(--ppa-border-strong);
+	margin: 0;
+	padding: 0 4px 0 7px;
+}
+ul.toplink li:first-child, ul.navlink li:first-child {
+	border: none;
+	padding-left: 0;
+}
+
+/** LINKS */
+a:active {
+	color: var(--ppa-accent-hover);
+	font-family: var(--ppa-font);
+	font-weight: normal;
+	text-decoration: underline;
+}
+a, a:link {
+	color: var(--ppa-link);
+	font-family: var(--ppa-font);
+	text-decoration: none;
+}
+a:visited {
+	color: var(--ppa-link);
+	font-family: var(--ppa-font);
+	text-decoration: none;
+}
+a:hover {
+	color: var(--ppa-link-hover);
+	font-family: var(--ppa-font);
+	text-decoration: underline;
+}
+a.navlink:link, a.toplink:link,
+ul.navlink li a, ul.toplink li a {
+	color: var(--ppa-link);
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	text-decoration: none;
+}
+a.navlink:visited, a.toplink:visited,
+ul.navlink li a:visited, ul.toplink li a:visited {
+	color: var(--ppa-link);
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	text-decoration: none;
+}
+a.navlink:hover, a.toplink:hover,
+ul.navlink li a:hover, ul.toplink li a:hover {
+	color: var(--ppa-link-hover);
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	text-decoration: underline;
+}
+a.navlink:active, a.toplink:active,
+ul.navlink li a:active, ul.toplink li a:active {
+	color: var(--ppa-accent-hover);
+	font-family: var(--ppa-font);
+	font-weight: 600;
+	text-decoration: underline;
+}
+.active a { font-weight: 600; }
+a.help {
+	color: var(--ppa-warning);
+	font-size: 11px;
+	vertical-align: super;
+	text-decoration: none;
+}
+
+/** PRE / CODE */
+pre {
+	font-family: var(--ppa-mono);
+	font-size: 12px;
+	background: var(--ppa-surface);
+	border: 1px solid var(--ppa-border);
+	border-radius: var(--ppa-radius);
+	padding: 6px 8px;
+}
+pre.data {
+	font-family: var(--ppa-mono);
+	font-size: 12px;
+}
+pre.error {
+	font-family: var(--ppa-mono);
+	font-size: 12px;
+	color: var(--ppa-danger);
+	background: #fdecea;
+	border-color: #f5c2be;
+}
+
+.intro li { font-weight: 600; }
+.ac_field { border: 1px solid var(--ppa-border-strong); }
+.bottom_link {
+	background: var(--ppa-surface-alt);
+	border-top: 1px solid var(--ppa-border);
+	border-left: 1px solid var(--ppa-border);
+	font-size: 11px;
+	color: var(--ppa-text-muted);
+}
+
+/** FK BROWSING (retain structural rules from default) */
+div#root > div.fk { border: 1px solid var(--ppa-border-strong); }
+div.fk {
+	background: var(--ppa-surface);
+	border-left: 1px solid var(--ppa-border-strong);
+	padding: 6px;
+}
+
+/** LOGO (nav frame header) — text-based, no PNG needed */
+div.logo {
+	background: linear-gradient(135deg, var(--ppa-accent) 0%, var(--ppa-accent-hover) 100%);
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	font-family: var(--ppa-font);
+	font-size: 15px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+	border: none;
+	border-bottom: 1px solid rgba(0,0,0,0.15);
+	margin-bottom: 4px;
+	height: 42px;
+	line-height: 42px;
+	text-align: center;
+	background-image: none;
+	background-repeat: no-repeat;
+}
+div.logo a,
+div.logo a:link,
+div.logo a:visited {
+	display: block;
+	height: 100%;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+}
+div.logo a:hover {
+	color: #fff;
+	text-decoration: none;
+	background: rgba(255,255,255,0.06);
+}
+
+/** REFRESH TREE ICON */
+.refreshTree {
+	float: right;
+	text-align: right;
+	padding: 4px 6px;
+}
+
+/** SYNTAX HIGHLIGHTING (override the shared defaults with palette-aware) */
+.comment { color: #6a737d; font-style: italic; }
+.keyword { color: var(--ppa-accent); font-weight: 600; }
+.literal { color: var(--ppa-warning); }
+
+/** HIGHLIGHT (search results, etc) */
+.highlight { background-color: #fff3b0; }
+
+/** TREE (XLoadTree) — subtle spacing, no color surprises */
+.webfx-tree-row { white-space: nowrap; padding: 1px 0; }
+.webfx-tree-item-label { margin-left: 4px; }
