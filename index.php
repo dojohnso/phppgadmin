@@ -86,10 +86,28 @@
 		f.document.addEventListener('click', clickHandler, true);
 	}
 
+	/**
+	 * Hook the detail frame's window `beforeunload` so ANY navigation
+	 * (form submits from login page, JS-driven redirects, back/forward, etc.)
+	 * shows the spinner — not just clicks on <a> tags. Each new page in the
+	 * frame gets a new window, so this must be rebound on every onload.
+	 */
+	function bindFrameUnload(frameName) {
+		var f = window.frames[frameName];
+		if (!f) return;
+		try {
+			f.removeEventListener('beforeunload', showSpinner);
+			f.addEventListener('beforeunload', showSpinner);
+		} catch (e) { /* cross-origin doc — ignore */ }
+	}
+
 	window.__ppaShowSpinner = showSpinner;
 	window.__ppaHideSpinner = hideSpinner;
 	window.__ppaBindBrowser = function () { bindFrame('browser'); };
-	window.__ppaBindDetail  = function () { bindFrame('detail'); };
+	window.__ppaBindDetail  = function () {
+		bindFrame('detail');
+		bindFrameUnload('detail');
+	};
 })();
 </script>
 JS;

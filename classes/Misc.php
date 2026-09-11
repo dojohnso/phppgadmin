@@ -540,15 +540,19 @@
 
 				echo "<head>\n";
 				echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n";
-				// Theme
-				echo "<link rel=\"stylesheet\" href=\"themes/{$conf['theme']}/global.css\" type=\"text/css\" id=\"csstheme\" />\n";
+				// Theme — append filemtime-based cache-buster so edits to global.css
+				// don't require users to hard-refresh. Bump mtime = new URL = fresh fetch.
+				$_cssPath = "themes/{$conf['theme']}/global.css";
+				$_cssVer  = @filemtime($_cssPath) ?: 0;
+				$_cssHref = "{$_cssPath}?v={$_cssVer}";
+				echo "<link rel=\"stylesheet\" href=\"{$_cssHref}\" type=\"text/css\" id=\"csstheme\" />\n";
 				echo "<link rel=\"shortcut icon\" href=\"images/themes/{$conf['theme']}/Favicon.ico\" type=\"image/vnd.microsoft.icon\" />\n";
 				echo "<link rel=\"icon\" type=\"image/png\" href=\"images/themes/{$conf['theme']}/Introduction.png\" />\n";
 				echo "<script type=\"text/javascript\" src=\"libraries/js/jquery.js\"></script>";
 				echo "<script type=\"text/javascript\">// <!-- \n";
 				echo "$(function() { \n";
 				echo "  if (window.parent.frames.length > 1)\n";
-				echo "    $('#csstheme', window.parent.frames[0].document).attr('href','themes/{$conf['theme']}/global.css');\n";
+				echo "    $('#csstheme', window.parent.frames[0].document).attr('href','{$_cssHref}');\n";
 				echo "}); // --></script>\n";
 				echo "<title>", htmlspecialchars($appName);
 				if ($title != '') echo htmlspecialchars(" - {$title}");
